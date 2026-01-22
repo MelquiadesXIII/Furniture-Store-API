@@ -1,0 +1,24 @@
+# Visual Studio
+bin/
+obj/
+[Ee]xpressions/
+[Tt]est[Rr]esults/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# User-specific files
+*.rsuser
+*.user
+*.userosscache
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build Results
+[Bb]in/
+[Oo]bj/
