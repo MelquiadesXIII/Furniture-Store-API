@@ -9,6 +9,7 @@ obj/
 
 # Visual Studio Code
 .vscode/
+.vs/
 
 # User-specific files
 *.rsuser
