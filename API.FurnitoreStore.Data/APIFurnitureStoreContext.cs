@@ -21,7 +21,7 @@ namespace API.FurnitoreStore.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite();
+            optionsBuilder.UseNpgsql();
         }
      }
 }
