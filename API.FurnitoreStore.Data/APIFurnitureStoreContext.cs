@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.FurnitoreStore.Shared;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.FurnitoreStore.Data
 {
-    public class APIFurnitureStoreContext : DbContext
+    public class APIFurnitureStoreContext : IdentityDbContext
     {
         public APIFurnitureStoreContext(DbContextOptions options) : base(options) { }
 
