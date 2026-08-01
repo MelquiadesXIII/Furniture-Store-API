@@ -10,12 +10,12 @@ namespace API.FurnitoreStore.Shared.DTOs
     public class UserRegistrationRequestDto
     {
         [Required]
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         [Required]
-        public string EmailAddress { get; set; }
+        public required string EmailAddress { get; set; }
 
         [Required]
-        public string Password { get; set; }
+        public required string Password { get; set; }
     }
 }
