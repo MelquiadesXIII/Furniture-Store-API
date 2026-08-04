@@ -2,6 +2,7 @@ using System.Text;
 using API.FurnitoreStore.API.Configuration;
 using API.FurnitoreStore.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -17,7 +18,7 @@ builder.Services.AddDbContext<APIFurnitureStoreContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("APIFurnitoreStoreContext")));
 
 
-//El codigo a agregar para configuear el jwt
+//El codigo a agregar para configurar el jwt
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 
 builder.Services.AddAuthentication(options =>
@@ -42,6 +43,10 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true
     };
 });
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options => 
+        options.SignIn.RequireConfirmedAccount = false)
+        .AddEntityFrameworkStores<APIFurnitureStoreContext>();
 
 var app = builder.Build();
 
