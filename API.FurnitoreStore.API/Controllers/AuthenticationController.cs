@@ -29,6 +29,7 @@ namespace API.FurnitoreStore.API.Controllers
             _jwtConfig = jwtConfig.Value;
         }
 
+        [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] UserRegistrationRequestDto request)
         {
             if(!ModelState.IsValid) return BadRequest();
@@ -76,15 +77,6 @@ namespace API.FurnitoreStore.API.Controllers
                     Errors = errors
                 });
             }
-
-            return BadRequest(new AuthResult
-            {
-                Result = false,
-                Errors = new List<string>
-                {
-                    "User couldn't be created"
-                }
-            });
         }
 
         private string GenerateToken(IdentityUser user)
