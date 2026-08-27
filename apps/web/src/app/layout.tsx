@@ -1,10 +1,34 @@
 import type { Metadata } from "next";
+import { Bricolage_Grotesque, Karla, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { SiteHeader } from "@/components/site-header";
+
+const display = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-display-family",
+  display: "swap",
+});
+
+const body = Karla({
+  subsets: ["latin"],
+  variable: "--font-body-family",
+  display: "swap",
+});
+
+const mono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono-family",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Furniture Store",
-  description: "Furniture Store web app",
+  description: "Catálogo de muebles hechos para durar.",
 };
+
+// Aplica el tema guardado antes del primer paint, para evitar el parpadeo del tema incorrecto.
+const THEME_INIT_SCRIPT = `(function(){try{var s=localStorage.getItem('theme');var d=s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -12,8 +36,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body>{children}</body>
+    <html
+      lang="es"
+      suppressHydrationWarning
+      className={`${display.variable} ${body.variable} ${mono.variable}`}
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="flex min-h-screen flex-col bg-surface font-body text-ink antialiased">
+        <SiteHeader />
+        <main className="flex flex-1 flex-col">{children}</main>
+      </body>
     </html>
   );
 }
