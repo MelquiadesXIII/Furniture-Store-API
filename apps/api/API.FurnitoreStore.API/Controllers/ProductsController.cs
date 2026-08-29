@@ -10,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.FurnitoreStore.API.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
@@ -22,12 +21,15 @@ namespace API.FurnitoreStore.API.Controllers
             _context = context;
          }
 
+        // El catálogo se muestra antes de iniciar sesión, así que las lecturas son públicas.
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IEnumerable<Product>> Get()
         {
             return await _context.Products.ToListAsync();
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDetails(int id)
         {
@@ -41,6 +43,7 @@ namespace API.FurnitoreStore.API.Controllers
             return Ok(product);
         }
 
+        [AllowAnonymous]
         [HttpGet("GetByCategory/{productCategoryId}")]
         public async Task<IEnumerable<Product>> GetByCategory(int productCategoryId)
         {
@@ -49,6 +52,7 @@ namespace API.FurnitoreStore.API.Controllers
                         .ToListAsync();
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Post(Product product)
         {
@@ -59,6 +63,7 @@ namespace API.FurnitoreStore.API.Controllers
             return CreatedAtAction("Post", product.Id, product);
         }
 
+         [Authorize]
          [HttpPut]
          public async Task<IActionResult> Put(Product product)
         {
@@ -68,6 +73,7 @@ namespace API.FurnitoreStore.API.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpDelete]
         public async Task<IActionResult> Delete(Product product)
         {

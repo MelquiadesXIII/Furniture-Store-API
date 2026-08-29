@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace API.FurnitoreStore.API.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProductCategoriesController : ControllerBase
@@ -23,12 +22,15 @@ namespace API.FurnitoreStore.API.Controllers
             _context = context;
          }
 
+        // El catálogo se muestra antes de iniciar sesión, así que las lecturas son públicas.
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IEnumerable<ProductCategory>> Get()
         {
             return await _context.ProductCategories.ToListAsync();
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDetails(int id)
         {
@@ -42,16 +44,18 @@ namespace API.FurnitoreStore.API.Controllers
             return Ok(productCategory);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Post(ProductCategory productCategory)
         {
-            
+
             await _context.ProductCategories.AddAsync(productCategory);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("Post", productCategory.Id, productCategory);
         }
 
+         [Authorize]
          [HttpPut]
          public async Task<IActionResult> Put(ProductCategory productCategory)
         {
@@ -61,6 +65,7 @@ namespace API.FurnitoreStore.API.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpDelete]
         public async Task<IActionResult> Delete(ProductCategory productCategory)
         {
