@@ -1,8 +1,5 @@
-export default function Home() {
-  return (
-    <main>
-      <h1>Furniture Store</h1>
-      <p>Next.js + Turborepo</p>
-    </main>
-  );
+import { ProductContainer } from "@/modules/products/list/product-container";
+
+export default function Page() {
+  return <ProductContainer />;
 }
