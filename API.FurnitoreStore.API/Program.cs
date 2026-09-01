@@ -14,39 +14,80 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<APIFurnitureStoreContext>(options => 
-    options.UseNpgsql(builder.Configuration.GetConnectionString("APIFurnitoreStoreContext")));
+var connectionString =
+    Environment.GetEnvironmentVariable("DATABASE_URL")
+    ?? builder.Configuration.GetConnectionString("APIFurnitoreStoreContext")
+    ?? throw new InvalidOperationException("DATABASE_URL not configured");
 
+builder.Services.AddDbContext<APIFurnitureStoreContext>(options =>
+    options.UseNpgsql(connectionString)
+);
 
-//El codigo a agregar para configurar el jwt
-builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+//Configurar JWT
+var jwtSecret =
+    Environment.GetEnvironmentVariable("JWT_SECRET")
+    ?? builder.Configuration["JwtConfig:Secret"]
+    ?? throw new InvalidOperationException("JWT_SECRET not configured");
 
-builder.Services.AddAuthentication(options =>
+var jwtIssuer =
+    Environment.GetEnvironmentVariable("JWT_ISSUER")
+    ?? builder.Configuration["JwtConfig:Issuer"]
+    ?? throw new InvalidOperationException("JWT_ISSUER not configured");
+
+var jwtAudience =
+    Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+    ?? builder.Configuration["JwtConfig:Audience"]
+    ?? throw new InvalidOperationException("JWT_AUDIENCE not configured");
+
+builder.Services.Configure<JwtConfig>(config =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(jwt =>
-{
-    //Aqui se guarda el valor del secret jwt
-    var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JwtConfig:Secret").Value!);
-
-    jwt.SaveToken = true;
-    jwt.TokenValidationParameters = new TokenValidationParameters()
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = false, //Esto en produccion debe ser verdadero, esto valida quien emitio el token para asegurarse q no hubo nadie intermedio que cambiara el token
-        ValidateAudience = false, //Esto en produccion debe ser verdadero, que el destinatario de este token debe ser el mismo que lo esta recibiendo
-        RequireExpirationTime = false, //Debe estar en verdadero cuando se ponga el Refresh token
-        ValidateLifetime = true
-    };
+    config.Secret = jwtSecret;
+    config.Issuer = jwtIssuer;
+    config.Audience = jwtAudience;
 });
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => 
-        options.SignIn.RequireConfirmedAccount = false)
-        .AddEntityFrameworkStores<APIFurnitureStoreContext>();
+builder
+    .Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(jwt =>
+    {
+        //Aqui se guarda el valor del secret jwt
+        var key = Encoding.UTF8.GetBytes(jwtSecret);
+
+        jwt.SaveToken = true;
+        jwt.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+
+            //Esto en produccion debe ser verdadero, esto valida quien emitio el token
+            // para asegurarse q no hubo nadie intermedio que cambiara el token
+            ValidateIssuer = true,
+            ValidIssuer = jwtIssuer,
+
+            //Esto en produccion debe ser verdadero, que el destinatario
+            // de este token debe ser el mismo que lo esta recibiendo
+            ValidateAudience = true,
+            ValidAudience = jwtAudience,
+
+            RequireExpirationTime = true,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
+        };
+    });
+
+builder
+    .Services.AddDefaultIdentity<IdentityUser>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = false;
+        options.Password.RequireDigit = true;
+        options.Password.RequiredLength = 8;
+    })
+    .AddEntityFrameworkStores<APIFurnitureStoreContext>();
 
 var app = builder.Build();
 
@@ -58,9 +99,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseRouting();
 app.MapControllers();
 
 app.Run();
