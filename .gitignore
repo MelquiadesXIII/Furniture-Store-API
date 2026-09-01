@@ -10,6 +10,7 @@ obj/
 # Visual Studio Code
 .vscode/
 .vs/
+*.csproj.user   
 
 # User-specific files
 *.rsuser
@@ -19,7 +20,14 @@ obj/
 *.user
 *.userosscache
 *.sln.docstates
+.env
+.env.*
+!.env.example
 
 # Build Results
 [Bb]in/
 [Oo]bj/
+
+publish/
+*.publish.xml
+*.pubxml
