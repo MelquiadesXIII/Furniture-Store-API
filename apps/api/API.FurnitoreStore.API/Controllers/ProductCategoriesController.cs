@@ -7,9 +7,11 @@ using API.FurnitoreStore.Data;
 using API.FurnitoreStore.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.FurnitoreStore.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProductCategoriesController : ControllerBase

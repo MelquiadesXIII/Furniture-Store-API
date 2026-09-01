@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using API.FurnitoreStore.Data;
 using API.FurnitoreStore.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.FurnitoreStore.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class OrdersController : ControllerBase
