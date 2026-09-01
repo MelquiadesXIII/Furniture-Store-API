@@ -31,3 +31,25 @@ obj/
 publish/
 *.publish.xml
 *.pubxml
+
+# ----- Monorepo: Node / JS / Turborepo -----
+
+# Dependencias
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# Turborepo
+.turbo/
+
+# Build / TypeScript
+dist/
+*.tsbuildinfo
+
+# OS / editor
+.DS_Store
+Thumbs.db

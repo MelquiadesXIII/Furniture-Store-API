@@ -1,0 +1,21 @@
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+indent_style = space
+
+[*.{js,jsx,mjs,cjs,ts,tsx,json,jsonc,yml,yaml,css,scss,html}]
+indent_size = 2
+trim_trailing_whitespace = true
+
+[*.md]
+indent_size = 2
+
+# Reglas de C# / .NET: añadir en un PR aparte, acordado con el equipo,
+# para evitar reformateos sorpresa sobre el código existente de la API.
+# [*.{cs,csproj,props,targets}]
+# indent_size = 4
+
+[*.sln]
+indent_style = tab
