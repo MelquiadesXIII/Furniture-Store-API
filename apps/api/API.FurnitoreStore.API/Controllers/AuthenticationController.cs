@@ -76,38 +76,40 @@ namespace API.FurnitoreStore.API.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequestDto request)
         {
-            if(!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid)
+                return BadRequest();
 
             // Chequear si el usuario existe
             var existingUser = await _userManager.FindByEmailAsync(request.Email);
 
-            if(existingUser == null) return BadRequest(new AuthResult()
-            {
-                Errors = new List<string>
-                {
-                    "Invalid Payload"
-                },
-                Result = false
-            });
+            if (existingUser == null)
+                return BadRequest(
+                    new AuthResult()
+                    {
+                        Errors = new List<string> { "Invalid Payload" },
+                        Result = false,
+                    }
+                );
 
-            var checkUserAndPass = await _userManager.CheckPasswordAsync(existingUser, request.Password);
+            var checkUserAndPass = await _userManager.CheckPasswordAsync(
+                existingUser,
+                request.Password
+            );
 
             if (!checkUserAndPass)
             {
-                return BadRequest(new AuthResult()
-                {
-                    Errors = new List<string> { "Invalid Credentials" },
-                    Result = false
-                });
+                return BadRequest(
+                    new AuthResult()
+                    {
+                        Errors = new List<string> { "Invalid Credentials" },
+                        Result = false,
+                    }
+                );
             }
 
             var token = GenerateToken(existingUser);
-            
-            return Ok(new AuthResult
-            {
-                Token = token,
-                Result = true
-            });
+
+            return Ok(new AuthResult { Token = token, Result = true });
         }
 
         private string GenerateToken(IdentityUser user)
@@ -136,6 +138,8 @@ namespace API.FurnitoreStore.API.Controllers
                     )
                 ),
                 Expires = DateTime.UtcNow.AddHours(1),
+                Issuer = _jwtConfig.Issuer,
+                Audience = _jwtConfig.Audience,
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256
