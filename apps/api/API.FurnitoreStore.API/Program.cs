@@ -77,6 +77,8 @@ builder.Services.Configure<JwtConfig>(config =>
     config.Audience = jwtAudience;
 });
 
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+
 builder
     .Services.AddAuthentication(options =>
     {
