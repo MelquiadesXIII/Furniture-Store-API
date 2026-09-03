@@ -3,6 +3,7 @@ using System;
 using API.FurnitoreStore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.FurnitoreStore.Data.Migrations
 {
     [DbContext(typeof(APIFurnitureStoreContext))]
-    partial class APIFurnitureStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20260903135004_Adding Refresh Tokens table")]
+    partial class AddingRefreshTokenstable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

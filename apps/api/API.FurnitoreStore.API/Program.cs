@@ -2,21 +2,19 @@ using System.Text;
 using API.FurnitoreStore.API.Configuration;
 using API.FurnitoreStore.API.Services;
 using API.FurnitoreStore.Data;
+using dotenv.net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using dotenv.net;
 
 var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsDevelopment())
 {
-    DotEnv.Load(options: new DotEnvOptions(
-        envFilePaths: new[] { "../.env" }
-    ));
+    DotEnv.Load(options: new DotEnvOptions(envFilePaths: new[] { "../.env" }));
 }
 
 // Add services to the container.
@@ -25,34 +23,36 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Furniture_Store_API",
-        Version = "v1"
-    });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "JWT Authorization header using the Bearer scheme. \n\n Enter prefix (Bearer), space, and then your token. Example 'Bearer 2287386hfdfhj'"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Furniture_Store_API", Version = "v1" });
+    c.AddSecurityDefinition(
+        "Bearer",
+        new OpenApiSecurityScheme()
         {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
+            Name = "Authorization",
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description =
+                "JWT Authorization header using the Bearer scheme. \n\n Enter prefix (Bearer), space, and then your token. Example 'Bearer 2287386hfdfhj'",
         }
-    });
+    );
+    c.AddSecurityRequirement(
+        new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer",
+                    },
+                },
+                new string[] { }
+            },
+        }
+    );
 });
 
 var connectionString =
@@ -64,7 +64,7 @@ builder.Services.AddDbContext<APIFurnitureStoreContext>(options =>
     options.UseNpgsql(connectionString)
 );
 
-//Configurar JWT
+//Configurar JWT con variables de entorno
 var jwtSecret =
     Environment.GetEnvironmentVariable("JWT_SECRET")
     ?? builder.Configuration["JwtConfig:Secret"]
@@ -85,11 +85,36 @@ builder.Services.Configure<JwtConfig>(config =>
     config.Secret = jwtSecret;
     config.Issuer = jwtIssuer;
     config.Audience = jwtAudience;
+    config.ExpiryTime = TimeSpan.Parse(builder.Configuration["JwtConfig:ExpiryTime"]);
 });
 
 // Email
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddSingleton<IEmailSender, EmailService>();
+
+//JWT
+var key = Encoding.UTF8.GetBytes(jwtSecret); //Aqui se guarda el valor del secret jwt
+var tokenValidationParameters = new TokenValidationParameters()
+{
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(key),
+
+    //Esto en produccion debe ser verdadero, esto valida quien emitio el token
+    // para asegurarse q no hubo nadie intermedio que cambiara el token
+    ValidateIssuer = true,
+    ValidIssuer = jwtIssuer,
+
+    //Esto en produccion debe ser verdadero, que el destinatario
+    // de este token debe ser el mismo que lo esta recibiendo
+    ValidateAudience = true,
+    ValidAudience = jwtAudience,
+
+    RequireExpirationTime = true,
+    ValidateLifetime = true,
+    ClockSkew = TimeSpan.Zero,
+};
+
+builder.Services.AddSingleton(tokenValidationParameters);
 
 builder
     .Services.AddAuthentication(options =>
@@ -100,29 +125,8 @@ builder
     })
     .AddJwtBearer(jwt =>
     {
-        //Aqui se guarda el valor del secret jwt
-        var key = Encoding.UTF8.GetBytes(jwtSecret);
-
         jwt.SaveToken = true;
-        jwt.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-
-            //Esto en produccion debe ser verdadero, esto valida quien emitio el token
-            // para asegurarse q no hubo nadie intermedio que cambiara el token
-            ValidateIssuer = true,
-            ValidIssuer = jwtIssuer,
-
-            //Esto en produccion debe ser verdadero, que el destinatario
-            // de este token debe ser el mismo que lo esta recibiendo
-            ValidateAudience = true,
-            ValidAudience = jwtAudience,
-
-            RequireExpirationTime = true,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero,
-        };
+        jwt.TokenValidationParameters = tokenValidationParameters;
     });
 
 builder
