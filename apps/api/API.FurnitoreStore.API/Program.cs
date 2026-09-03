@@ -1,7 +1,9 @@
 using System.Text;
 using API.FurnitoreStore.API.Configuration;
+using API.FurnitoreStore.API.Services;
 using API.FurnitoreStore.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -77,7 +79,9 @@ builder.Services.Configure<JwtConfig>(config =>
     config.Audience = jwtAudience;
 });
 
+// Email
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.AddSingleton<IEmailSender, EmailService>();
 
 builder
     .Services.AddAuthentication(options =>
