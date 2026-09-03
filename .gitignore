@@ -23,6 +23,7 @@ obj/
 .env
 .env.*
 !.env.example
+app-password.txt
 
 # Build Results
 [Bb]in/
