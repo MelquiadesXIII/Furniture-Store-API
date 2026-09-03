@@ -165,7 +165,8 @@ namespace API.FurnitoreStore.API.Controllers
 
             try
             {
-                _tokenValidationParameters.ValidateLifetime = false; // TODO tener en cuenta en produccion
+                var tokenValidationParameters = _tokenValidationParameters.Clone();
+                tokenValidationParameters.ValidateLifetime = false;
 
                 var tokenBeingVerified = jwtTokenHandler.ValidateToken(
                     tokenRequest.Token,
@@ -184,17 +185,6 @@ namespace API.FurnitoreStore.API.Controllers
                         throw new Exception("Invalid Token");
                 }
 
-                var utcExpiryDate = long.Parse(
-                    tokenBeingVerified
-                        .Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Exp)
-                        .Value
-                );
-
-                var expiryDate = DateTimeOffset.FromUnixTimeSeconds(utcExpiryDate).UtcDateTime;
-
-                if (expiryDate < DateTime.UtcNow)
-                    throw new Exception("Expired Token");
-
                 var storedToken = await _context.RefreshTokens.FirstOrDefaultAsync(t =>
                     t.Token == tokenRequest.RefreshToken
                 );
@@ -205,15 +195,15 @@ namespace API.FurnitoreStore.API.Controllers
                 if (storedToken.IsUsed || storedToken.IsRevoked)
                     throw new Exception("Invalid Token");
 
+                if (storedToken.ExpiryDate < DateTime.UtcNow)
+                    throw new Exception("Expired Token");
+
                 var jti = tokenBeingVerified
                     .Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)
                     .Value;
 
                 if (jti != storedToken.JwtId)
                     throw new Exception("Invalid Token");
-
-                if (storedToken.ExpiryDate < DateTime.UtcNow)
-                    throw new Exception("Expired Token");
 
                 storedToken.IsUsed = true;
                 _context.RefreshTokens.Update(storedToken);
