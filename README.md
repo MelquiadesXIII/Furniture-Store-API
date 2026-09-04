@@ -1,4 +1,4 @@
-# Furniture Store
+# Furnistore
 
 Monorepo gestionado con [Turborepo](https://turbo.build) y pnpm.
 

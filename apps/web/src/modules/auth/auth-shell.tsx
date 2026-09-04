@@ -40,7 +40,7 @@ export function AuthShell({
         <div className="relative z-10">
           {photo && <ChairMark className="mb-3 h-10 w-10 text-accent md:h-12 md:w-12" />}
           <p className="font-display text-3xl font-semibold tracking-tight text-ink md:text-4xl">
-            Furniture Store
+            Furnistore
           </p>
           <p className="mt-2 max-w-xs font-mono text-xs uppercase tracking-widest text-ink-muted">
             Piezas hechas para durar

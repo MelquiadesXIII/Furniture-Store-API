@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Karla, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
-import { SiteHeader } from "@/components/site-header";
 
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -23,7 +22,7 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Furniture Store",
+  title: "Furnistore",
   description: "Catálogo de muebles hechos para durar.",
 };
 
@@ -45,7 +44,6 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body className="flex min-h-screen flex-col bg-surface font-body text-ink antialiased">
-        <SiteHeader />
         <main className="flex flex-1 flex-col">{children}</main>
       </body>
     </html>

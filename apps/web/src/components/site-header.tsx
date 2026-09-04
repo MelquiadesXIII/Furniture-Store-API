@@ -15,7 +15,7 @@ export async function SiteHeader() {
           className="flex items-center gap-2 font-display text-lg font-semibold tracking-tight text-ink"
         >
           <ChairMark className="h-6 w-6 text-accent" />
-          Furniture Store
+          Furnistore
         </Link>
         <div className="flex items-center gap-3">
           <ThemeToggle />

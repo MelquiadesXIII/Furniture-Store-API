@@ -1,4 +1,4 @@
-# API — Furniture Store
+# API — Furnistore
 
 Referencia de los servicios expuestos por `apps/api` (`API.FurnitoreStore.API`), lista para consumir desde el frontend u otro cliente. Generado a partir del código fuente de los controladores (no de un contrato aparte), así que refleja el comportamiento real, incluidas sus inconsistencias.
 
