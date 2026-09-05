@@ -1,45 +1,107 @@
-const API_BASE_URL = process.env.API_BASE_URL;
+import "server-only";
 
-if (!API_BASE_URL) {
-  throw new Error("API_BASE_URL no está configurada (ver apps/web/.env.example)");
+import type { AppError, AppErrorKind } from "@/lib/errors";
+import { err, ok, type Result } from "@/lib/result";
+
+const DEFAULT_TIMEOUT_MS = 8000;
+
+function getBaseUrl(): string {
+  const baseUrl = process.env.API_BASE_URL;
+  if (!baseUrl) {
+    throw new Error("API_BASE_URL no está configurada (ver apps/web/.env.example)");
+  }
+  return baseUrl;
 }
 
-export class ApiError extends Error {
-  status: number;
-  errors: string[];
-
-  constructor(status: number, errors: string[]) {
-    super(errors[0] ?? `Error de la API (${status})`);
-    this.status = status;
-    this.errors = errors;
-  }
+function kindForStatus(status: number): AppErrorKind {
+  if (status === 401 || status === 403) return "unauthorized";
+  if (status === 404) return "notFound";
+  if (status >= 500) return "server";
+  if (status >= 400) return "validation";
+  return "unexpected";
 }
 
-type ApiFetchInit = Omit<RequestInit, "body"> & { body?: unknown };
+function extractMessages(data: unknown): string[] {
+  if (!data || typeof data !== "object") return [];
 
-export async function apiFetch<T>(path: string, init: ApiFetchInit = {}): Promise<T> {
-  const { body, headers, ...rest } = init;
+  const body = data as { errors?: unknown; title?: unknown };
 
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    ...rest,
-    headers: {
-      "Content-Type": "application/json",
-      ...headers,
-    },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-    cache: "no-store",
-  });
-
-  if (res.status === 204) {
-    return undefined as T;
+  if (Array.isArray(body.errors)) {
+    return body.errors.filter((message): message is string => typeof message === "string");
   }
 
-  const data = await res.json().catch(() => null);
-
-  if (!res.ok) {
-    const errors: string[] = data?.errors ?? [data?.title ?? `Error de la API (${res.status})`];
-    throw new ApiError(res.status, errors);
+  if (body.errors && typeof body.errors === "object") {
+    return Object.values(body.errors as Record<string, unknown>)
+      .flat()
+      .filter((message): message is string => typeof message === "string");
   }
 
-  return data as T;
+  return typeof body.title === "string" ? [body.title] : [];
+}
+
+function isTimeout(cause: unknown): boolean {
+  return (
+    typeof cause === "object" &&
+    cause !== null &&
+    (cause as { name?: unknown }).name === "TimeoutError"
+  );
+}
+
+function failure(
+  error: AppError,
+  method: string,
+  path: string,
+  cause?: unknown,
+): { ok: false; error: AppError } {
+  const status = error.status ? ` ${error.status}` : "";
+  console.error(`[api] ${method} ${path} → ${error.kind}${status}`, cause ?? error.messages);
+  return err(error);
+}
+
+type ApiFetchInit = Omit<RequestInit, "body" | "signal"> & {
+  body?: unknown;
+  timeoutMs?: number;
+};
+
+export async function apiFetch<T>(
+  path: string,
+  init: ApiFetchInit = {},
+): Promise<Result<T, AppError>> {
+  const { body, headers, timeoutMs = DEFAULT_TIMEOUT_MS, ...rest } = init;
+  const method = rest.method ?? "GET";
+
+  let response: Response;
+
+  try {
+    response = await fetch(`${getBaseUrl()}${path}`, {
+      ...rest,
+      headers: { "Content-Type": "application/json", ...headers },
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      cache: "no-store",
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (cause) {
+    const kind = isTimeout(cause) ? "timeout" : "network";
+    return failure({ kind, messages: [] }, method, path, cause);
+  }
+
+  if (response.status === 204) {
+    return ok(undefined as T);
+  }
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    return failure(
+      {
+        kind: kindForStatus(response.status),
+        status: response.status,
+        messages: extractMessages(data),
+      },
+      method,
+      path,
+    );
+  }
+
+  return ok(data as T);
 }

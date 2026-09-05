@@ -1,24 +1,26 @@
 import { NextResponse } from "next/server";
-import { register } from "@/modules/auth/api";
-import { ApiError } from "@/lib/api/client";
+import { toUserMessage } from "@/lib/errors";
 import { SESSION_COOKIE, sessionCookieOptions } from "@/lib/session-constants";
+import { register } from "@/modules/auth/api";
 
 export async function POST(request: Request) {
   const { name, emailAddress, password } = await request.json();
 
-  try {
-    const result = await register(name, emailAddress, password);
+  const result = await register(name, emailAddress, password);
 
-    if (!result.token) {
-      return NextResponse.json({ errors: ["No se pudo crear la cuenta."] }, { status: 502 });
-    }
-
-    const response = NextResponse.json({ ok: true });
-    response.cookies.set(SESSION_COOKIE, result.token, sessionCookieOptions);
-    return response;
-  } catch (err) {
-    const errors = err instanceof ApiError ? err.errors : ["No se pudo conectar con el servidor."];
-    const status = err instanceof ApiError ? err.status : 502;
-    return NextResponse.json({ errors }, { status });
+  if (!result.ok) {
+    const { error } = result;
+    return NextResponse.json(
+      { errors: error.messages.length > 0 ? error.messages : [toUserMessage(error)] },
+      { status: error.status ?? 502 },
+    );
   }
+
+  if (!result.value.token) {
+    return NextResponse.json({ errors: ["No se pudo crear la cuenta."] }, { status: 502 });
+  }
+
+  const response = NextResponse.json({ ok: true });
+  response.cookies.set(SESSION_COOKIE, result.value.token, sessionCookieOptions);
+  return response;
 }
