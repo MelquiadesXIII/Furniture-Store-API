@@ -2,11 +2,17 @@ import { getSession } from "@/lib/session";
 import { getProducts } from "@/modules/products/api";
 import type { Product } from "@/modules/products/types";
 import { ProductGrill } from "@/modules/products/list/product-grill";
+import { ProductPagination } from "@/modules/products/list/product-pagination";
+
+const PAGE_SIZE = 12;
 
 // Nivel más alto del feature (lo único que importa la página). Interactúa con
 // la API: trae la sesión (para saber si mostrar "Comprar" o el gate a /login)
 // y el catálogo, y decide qué se renderiza según el resultado.
-export async function ProductContainer({ query }: { query?: string } = {}) {
+export async function ProductContainer({
+  query,
+  page,
+}: { query?: string; page?: string } = {}) {
   const isAuthenticated = Boolean(await getSession());
 
   let products: Product[] = [];
@@ -24,6 +30,16 @@ export async function ProductContainer({ query }: { query?: string } = {}) {
         product.name.toLowerCase().includes(trimmedQuery.toLowerCase()),
       )
     : products;
+
+  const totalPages = Math.max(1, Math.ceil(visibleProducts.length / PAGE_SIZE));
+  const requestedPage = Number.parseInt(page ?? "1", 10);
+  const currentPage = Number.isFinite(requestedPage)
+    ? Math.min(Math.max(1, requestedPage), totalPages)
+    : 1;
+  const pageProducts = visibleProducts.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   return (
     <div className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">
@@ -51,7 +67,16 @@ export async function ProductContainer({ query }: { query?: string } = {}) {
           </p>
         </div>
       ) : (
-        <ProductGrill products={visibleProducts} isAuthenticated={isAuthenticated} />
+        <>
+          <ProductGrill products={pageProducts} isAuthenticated={isAuthenticated} />
+          {totalPages > 1 && (
+            <ProductPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              query={trimmedQuery}
+            />
+          )}
+        </>
       )}
     </div>
   );
