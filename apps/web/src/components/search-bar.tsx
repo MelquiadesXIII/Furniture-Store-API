@@ -36,7 +36,7 @@ export function SearchBar() {
         value={value}
         onChange={(event) => setValue(event.target.value)}
         placeholder="Buscar piezas..."
-        className="bg-surface-raised pl-9"
+        className="bg-surface pl-9"
       />
     </div>
   );
