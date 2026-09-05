@@ -77,7 +77,23 @@ namespace API.FurnitoreStore.API.Controllers
 
             if (isCreated.Succeeded)
             {
-                await SendVerificationEmail(user);
+                try
+                {
+                    await SendVerificationEmail(user);
+                }
+                catch (Exception)
+                {
+                    return Ok(
+                        new AuthResult()
+                        {
+                            Result = true,
+                            Errors = new List<string>()
+                            {
+                                "User created successfully, but there was an error sending the verification email. Please try to confirm your email later."
+                            }
+                        }
+                    );
+                }
 
                 return Ok(new AuthResult() { Result = true });
             }
