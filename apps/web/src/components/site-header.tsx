@@ -1,26 +1,35 @@
 import Link from "next/link";
-import { getSession } from "@/lib/session";
+import { Suspense } from "react";
+import { getSessionUser } from "@/lib/session";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { LogoutButton } from "@/components/logout-button";
+import { UserMenu } from "@/components/user-menu";
+import { SearchBar } from "@/components/search-bar";
 import { ChairMark } from "@/components/furniture-marks";
 
 export async function SiteHeader() {
-  const session = await getSession();
+  const user = await getSessionUser();
 
   return (
-    <header>
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <header className="sticky top-0 z-20 border-b border-hairline bg-surface/90 backdrop-blur supports-[backdrop-filter]:bg-surface/75">
+      <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
         <Link
           href="/"
-          className="flex items-center gap-2 font-display text-lg font-semibold tracking-tight text-ink"
+          className="flex shrink-0 items-center gap-2 font-display text-lg font-semibold tracking-tight text-ink"
         >
           <ChairMark className="h-6 w-6 text-accent" />
           Furnistore
         </Link>
-        <div className="flex items-center gap-3">
+
+        <div className="flex flex-1 justify-center">
+          <Suspense fallback={<div className="h-8 w-full max-w-md" />}>
+            <SearchBar />
+          </Suspense>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-3">
           <ThemeToggle />
-          {session ? (
-            <LogoutButton />
+          {user ? (
+            <UserMenu email={user.email} />
           ) : (
             <Link
               href="/login"
