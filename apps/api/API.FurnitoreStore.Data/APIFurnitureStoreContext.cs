@@ -63,7 +63,6 @@ namespace API.FurnitoreStore.Data
                 // Estanterías
                 new Product { Id = 9, Name = "Estantería Modular Roble", Price = 259.00m, ProductCategoryId = 3 },
                 new Product { Id = 10, Name = "Librero Escalera Pino", Price = 179.00m, ProductCategoryId = 3 },
-                new Product { Id = 11, Name = "Estante Flotante Nogal (Set x3)", Price = 89.90m, ProductCategoryId = 3 },
                 new Product { Id = 12, Name = "Vitrina Vintage", Price = 449.00m, ProductCategoryId = 3 },
                 // Lámparas
                 new Product { Id = 13, Name = "Lámpara de Pie Arco", Price = 159.00m, ProductCategoryId = 4 },
