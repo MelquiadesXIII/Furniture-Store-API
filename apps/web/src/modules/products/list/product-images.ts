@@ -15,8 +15,6 @@ import img14 from "@/assets/mock-cards/14-lampara-mesa-ceramica.jpg";
 import img15 from "@/assets/mock-cards/15-lampara-colgante-rattan.jpg";
 import img16 from "@/assets/mock-cards/16-lampara-led-escritorio.jpg";
 
-// Fotos de stock (Pexels, uso libre) para el catálogo de prueba, mapeadas por
-// id de producto. Un producto sin entrada aquí cae al ícono de FURNITURE_MARKS.
 export const PRODUCT_IMAGES: Record<number, StaticImageData> = {
   1: img01,
   2: img02,

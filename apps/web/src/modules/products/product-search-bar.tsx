@@ -2,27 +2,38 @@
 
 import { Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 
-export function SearchBar() {
+const DEBOUNCE_MS = 300;
+
+export function ProductSearchBar() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [value, setValue] = useState(searchParams.get("q") ?? "");
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const handle = setTimeout(() => {
       const params = new URLSearchParams(searchParams);
+
       if (value) {
         params.set("q", value);
       } else {
         params.delete("q");
       }
+
+      params.delete("page");
+
       const query = params.toString();
       router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, 300);
+    }, DEBOUNCE_MS);
 
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -35,6 +46,7 @@ export function SearchBar() {
         type="search"
         value={value}
         onChange={(event) => setValue(event.target.value)}
+        aria-label="Buscar piezas"
         placeholder="Buscar piezas..."
         className="bg-surface pl-9"
       />

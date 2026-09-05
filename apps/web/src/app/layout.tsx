@@ -26,7 +26,6 @@ export const metadata: Metadata = {
   description: "Catálogo de muebles hechos para durar.",
 };
 
-// Aplica el tema guardado antes del primer paint, para evitar el parpadeo del tema incorrecto.
 const THEME_INIT_SCRIPT = `(function(){try{var s=localStorage.getItem('theme');var d=s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
 
 export default function RootLayout({

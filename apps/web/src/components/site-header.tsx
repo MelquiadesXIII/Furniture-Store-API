@@ -4,9 +4,9 @@ import { Suspense } from "react";
 import { getSessionUser } from "@/lib/session";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { UserMenu } from "@/components/user-menu";
-import { SearchBar } from "@/components/search-bar";
 import { ChairMark } from "@/components/furniture-marks";
+import { UserMenu } from "@/modules/auth/user-menu";
+import { ProductSearchBar } from "@/modules/products/product-search-bar";
 
 export async function SiteHeader() {
   const user = await getSessionUser();
@@ -24,7 +24,7 @@ export async function SiteHeader() {
 
         <div className="flex flex-1 justify-center">
           <Suspense fallback={<div className="h-8 w-full max-w-md" />}>
-            <SearchBar />
+            <ProductSearchBar />
           </Suspense>
         </div>
 

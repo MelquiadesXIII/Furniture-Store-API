@@ -5,8 +5,6 @@ import { useState, type FormEvent } from "react";
 import { translateAuthError } from "@/modules/auth/error-messages";
 import { RegisterForm } from "@/modules/auth/register/register-form";
 
-// Nivel más alto de esta composición: interactúa con la API (la ruta interna
-// que arma la cookie httpOnly) y le pasa al form solo el resultado a mostrar.
 export function RegisterContainer() {
   const router = useRouter();
   const [errors, setErrors] = useState<string[]>([]);

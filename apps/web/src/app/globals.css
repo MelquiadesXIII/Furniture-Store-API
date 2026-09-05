@@ -16,12 +16,6 @@
   --hairline: #ddd5c6;
   --brick: #a83a26;
 
-  /*
-   * Tokens que espera shadcn/ui, mapeados a la paleta de arriba en vez de aceptar
-   * los grises por defecto del preset. Solo se declaran aquí (no en .dark): al ser
-   * `var(--surface)` etc., heredan el cambio de tema automáticamente porque
-   * --surface/--ink/--accent/--hairline/--brick ya cambian dentro de .dark.
-   */
   --background: var(--surface);
   --foreground: var(--ink);
   --card: var(--surface-raised);
@@ -68,7 +62,6 @@
   --font-body: var(--font-body-family), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-family), ui-monospace, SFMono-Regular, monospace;
 
-  /* Tokens de shadcn/ui (ver mapeo arriba en :root). */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -108,16 +101,12 @@
   background: linear-gradient(162deg, var(--surface) 0%, transparent 120%);
 }
 
-/* Sombra interna sobre la foto: usa el color del panel (--surface, que ya cambia
-   entre claro y oscuro) para fundir los bordes de la foto con el panel. */
 .auth-photo-depth {
   box-shadow:
     inset -44px 0 60px -40px color-mix(in srgb, var(--surface) 92%, transparent),
     inset 0 0 90px color-mix(in srgb, var(--surface) 35%, transparent);
 }
 
-/* Panel del formulario: se apoya por encima de la foto y proyecta sombra
-   (del propio color del panel) sobre ella. */
 .auth-form-panel {
   position: relative;
   z-index: 10;

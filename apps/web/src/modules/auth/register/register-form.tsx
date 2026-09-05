@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-// Nivel presentacional: solo primitivos de shadcn/ui, sin estado ni fetch propios.
 export function RegisterForm({
   pending,
   errors,
@@ -52,7 +51,7 @@ export function RegisterForm({
           name="password"
           type="password"
           required
-          minLength={8} // coincide con Identity.Password.RequiredLength en la API
+          minLength={8}
           autoComplete="new-password"
           className="bg-surface-raised"
         />

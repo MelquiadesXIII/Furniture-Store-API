@@ -5,8 +5,6 @@ import { useState, type FormEvent } from "react";
 import { translateAuthError } from "@/modules/auth/error-messages";
 import { LoginForm } from "@/modules/auth/login/login-form";
 
-// Nivel más alto de esta composición: interactúa con la API (la ruta interna
-// que arma la cookie httpOnly) y le pasa al form solo el resultado a mostrar.
 export function LoginContainer() {
   const router = useRouter();
   const [errors, setErrors] = useState<string[]>([]);

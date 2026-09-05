@@ -2,8 +2,6 @@ import QRCode from "qrcode";
 
 const REPO_URL = "https://github.com/MelquiadesXIII/furniture-store";
 
-// Marca oficial de GitHub (Octicons "mark-github", MIT) — no es un ícono de
-// lucide-react a propósito: esa librería excluye logos de marca.
 function GithubMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden className={className}>
@@ -13,8 +11,6 @@ function GithubMark({ className }: { className?: string }) {
 }
 
 export async function SiteFooter() {
-  // QR sobre una tarjeta blanca fija (no la paleta del sitio): así se garantiza
-  // contraste suficiente para escanear sin importar el tema claro/oscuro activo.
   const qrSvg = await QRCode.toString(REPO_URL, {
     type: "svg",
     margin: 1,
